@@ -30,3 +30,23 @@ collection_name VARCHAR(40) UNIQUE NOT null,
 treck_id int references Trecks(treck_id)
 year_release date,
 );
+
+CREATE TABLE IF NOT EXISTS Genre_Singers (
+	genre_id INTEGER REFERENCES Genre(genre_id),
+	singer_id INTEGER REFERENCES Singers(singer_id),
+	CONSTRAINT gs PRIMARY KEY (genre_id, singer_id)
+);
+
+CREATE TABLE IF NOT EXISTS Singers_Albums (
+	singer_id INTEGER REFERENCES Singers(singer_id),
+	album_id INTEGER REFERENCES Albums(album_id),
+	CONSTRAINT sa PRIMARY KEY (singer_id, album_id )
+);
+
+CREATE TABLE IF NOT EXISTS Trecks_Collections (
+	singer_id INTEGER REFERENCES Trecks(treck_id),
+	album_id INTEGER REFERENCES Collections(collection_id),
+	CONSTRAINT tc PRIMARY KEY (treck_id, collection_id)
+);
+
+
