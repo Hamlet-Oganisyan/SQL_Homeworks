@@ -27,11 +27,16 @@ group by a.album_name
 order by a.album_name
 
 --4) все исполнители, которые не выпустили альбомы в 2020 году
-select singer_name, a.year_release 
-from singers s 
-join singers_albums sa on s.singer_id = sa.singer_id 
-join albums a on a.album_id  = sa.album_id
-where year_release != '2020-01-01'
+select distinct s.singer_name 
+from singers s
+where singer_name not in (
+	select distinct s.singer_name
+	from singers s
+	join singers_albums sa on s.singer_id = sa.singer_id 
+	join albums a on a.album_id  = sa.album_id
+	where year_release = '2020-01-01'
+)
+order by s.singer_name 
 
 --5) названия сборников, в которых присутствует конкретный исполнитель
 select collection_name, s.singer_name
@@ -55,13 +60,15 @@ join trecks_singers ts on s.singer_id = ts.singer_id
 join trecks t on t.treck_id = ts.treck_id 
 where t.treck_duration = (select min(treck_duration) from trecks t )
 
---9) название альбомов, содержащих наименьшее количество треков(в нашем случаем меньше 3-х)
-select a.album_name, count(t.treck_name) as trecks_count 
+--9) название альбомов, содержащих наименьшее количество треков
+select a.album_name, count(t.treck_id) as trecks_count 
 from albums a 
 join albums_trecks at2 on a.album_id = at2.album_id 
 join trecks t on t.treck_id = at2.treck_id 
-group by a.album_name
-having count(t.treck_name) < 3
-
-
+group by a.album_id  
+having count(t.treck_id) = (
+	select min(minimum) 
+	from (select count(t.treck_id) as minimum from trecks t 
+	join albums_trecks at3 on t.treck_id = at3.treck_id
+	group by at3.album_id) as xxx)
 
